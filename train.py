@@ -4,8 +4,6 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn import metrics
-from sklearn.tree import DecisionTreeClassifier
-from xgboost import XGBClassifier
 from sklearn.linear_model import LogisticRegression
 from imblearn.over_sampling import RandomOverSampler
 
@@ -54,7 +52,7 @@ def encode_labels(data: pd.DataFrame) -> pd.DataFrame:
     for col in data.columns:
         if data[col].dtype == 'object':
             le = LabelEncoder()
-        data[col] = le.fit_transform(data[col])
+            data[col] = le.fit_transform(data[col])
     return data
 
 def feature_engineering(df: pd.DataFrame) -> pd.DataFrame:
@@ -100,7 +98,7 @@ def train_and_evaluate(df: pd.DataFrame):
     print('===============================================================================')
 
 def main():
-    df = load_data('train.csv')
+    df = load_data('data/train.csv')
     df = clean_data(df)
     df = feature_engineering(df)
     train_and_evaluate(df)
