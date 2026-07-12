@@ -64,7 +64,7 @@ def health():
 def predict(data: AutismInput):
     try:
         # 1. Ubah input jadi 1 baris DataFrame
-        df = pd.DataFrame([data.dict()])
+        df = pd.DataFrame([data.model_dump()])
 
         # 2. Terapkan preprocessing YANG SAMA PERSIS dengan train.py
         df = clean_data(df)

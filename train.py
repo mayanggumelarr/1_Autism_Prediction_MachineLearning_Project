@@ -26,7 +26,7 @@ def encode_labels(data: pd.DataFrame) -> pd.DataFrame:
         if data[col].dtype == 'object':
             le = LabelEncoder()
             data[col] = le.fit_transform(data[col])
-            encoders[col] = le.fit_transform(data[col])
+            encoders[col] = le
     return data, encoders
 
 def feature_engineering(df: pd.DataFrame) -> pd.DataFrame:

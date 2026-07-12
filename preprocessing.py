@@ -40,7 +40,7 @@ def encode_with_saved_encoders(df: pd.DataFrame, encoders: dict) -> pd.DataFrame
     for col, le in encoders.items():
         if col not in df.columns:
             continue
-        known_classes = set(le.classes)
+        known_classes = set(le.classes_)
         df[col] = df[col].apply(lambda v: v if v in known_classes else le.classes_[0])
         df[col] = le.transform(df[col])
     return df
