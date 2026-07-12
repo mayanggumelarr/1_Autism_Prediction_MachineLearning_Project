@@ -12,42 +12,12 @@ from imblearn.over_sampling import RandomOverSampler
 import warnings
 warnings.filterwarnings('ignore')
 
+from preprocessing import clean_data, convert_age, add_clinic_feature
+
 def load_data(path: str = 'train.csv') -> pd.DataFrame:
     """Step 1: Import dataset"""
     return pd.read_csv(path)
 
-def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-    """Step 2: Data Cleaning"""
-    df = df.replace({
-        'yes' : 1,
-        'no' : 0,
-        '?' : 'Others',
-        'others' : 'Others'
-    })
-    return df
-
-def convert_age(age):
-    """Step 3: Feature Engineering Group age"""
-    if age < 4:
-        return 'Toddler'
-    elif age >= 4 and age < 12:
-        return 'Kid'
-    elif age >= 12 and age < 18:
-        return 'Teenager'
-    elif age >= 18 and age < 40:
-        return 'Adult'
-    else:
-        return 'Senior'
-    
-def add_clinic_feature(data: pd.DataFrame) -> pd.DataFrame:
-    """Step 4: Menambahkan feature add skor klinis"""
-    data['sum_score'] = 0
-    for col in data.loc[:, 'A1_Score':'A10_Score'].columns:
-        data['sum_score'] += data[col]
-
-    data['ind'] = data['austim'] + data['used_app_before'] + data['jaundice']
-
-    return data
 
 def encode_labels(data: pd.DataFrame) -> pd.DataFrame:
     """Step 5: Encoding Label"""
@@ -56,6 +26,7 @@ def encode_labels(data: pd.DataFrame) -> pd.DataFrame:
         if data[col].dtype == 'object':
             le = LabelEncoder()
             data[col] = le.fit_transform(data[col])
+            encoders[col] = le.fit_transform(data[col])
     return data, encoders
 
 def feature_engineering(df: pd.DataFrame) -> pd.DataFrame:
