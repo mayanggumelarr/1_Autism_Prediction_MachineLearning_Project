@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import os
+import joblib
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
@@ -49,11 +51,12 @@ def add_clinic_feature(data: pd.DataFrame) -> pd.DataFrame:
 
 def encode_labels(data: pd.DataFrame) -> pd.DataFrame:
     """Step 5: Encoding Label"""
+    encoders = {}
     for col in data.columns:
         if data[col].dtype == 'object':
             le = LabelEncoder()
             data[col] = le.fit_transform(data[col])
-    return data
+    return data, encoders
 
 def feature_engineering(df: pd.DataFrame) -> pd.DataFrame:
     """Step 6: Feature Engineering
@@ -72,6 +75,7 @@ def train_and_evaluate(df: pd.DataFrame):
     removal = ['ID', 'age_desc', 'used_app_before', 'austim']
     features = df.drop(removal + ['Class/ASD'], axis=1)
     target = df['Class/ASD']
+    feature_columns = list(features.columns)
 
     # Split
     X_train, X_val, Y_train, Y_val = train_test_split(features, target, test_size = 0.2, random_state=10)
@@ -97,11 +101,28 @@ def train_and_evaluate(df: pd.DataFrame):
     print(f'Classification Report Val: \n', metrics.classification_report(Y_val, model.predict(X_val)))
     print('===============================================================================')
 
+    # Saving
+    best_model = model
+    return best_model, scaler, feature_columns
+
 def main():
     df = load_data('data/train.csv')
     df = clean_data(df)
-    df = feature_engineering(df)
-    train_and_evaluate(df)
+    df, encoders = feature_engineering(df)
+    model, scaler, feature_columns = train_and_evaluate(df)
+
+    # Bagian Baru: Simpan model di folder models/
+    os.makedirs('models', exist_ok=True)
+    joblib.dump(model, 'models/model.pkl')
+    joblib.dump(scaler, 'models/scaler.pkl')
+    joblib.dump(encoders, 'models/encoders.pkl')
+    joblib.dump(feature_columns, 'models/feature_columns.pkl')
+
+    print('\nModel & artifacts tersimpan di folder models/:')
+    print('  - models/model.pkl            (Logistic Regression yang sudah dilatih)')
+    print('  - models/scaler.pkl           (StandardScaler)')
+    print('  - models/encoders.pkl         (LabelEncoder tiap kolom kategorikal)')
+    print('  - models/feature_columns.pkl  (urutan kolom fitur saat training)')
 
 if __name__== '__main__':
     main()
